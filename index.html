@@ -68,12 +68,7 @@ nav.scrolled{background:rgba(4,4,8,.92);border-bottom-color:rgba(255,255,255,.06
 
 .card{position:relative;border-radius:12px;overflow:hidden;background:#0c0c12;border:1px solid rgba(255,255,255,.04);transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s,border-color .3s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-6px);box-shadow:0 24px 48px -8px rgba(0,0,0,.5),0 0 0 1px rgba(59,130,246,.08);border-color:rgba(59,130,246,.12)}
-.card-img{position:relative;aspect-ratio:1;overflow:hidden;background:#08080c}
-.card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s ease,transform .6s cubic-bezier(.22,1,.36,1)}
-.card-img img:first-child{position:relative;opacity:1}
-.card-img img:nth-child(n+2){opacity:0}
-.card:hover .card-img img:first-child{opacity:0;transform:scale(1.06)}
-.card:hover .card-img img:nth-child(2){opacity:1}
+.card-img{position:relative;aspect-ratio:1;overflow:hidden;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);display:flex;align-items:center;justify-content:center;font-size:48px}
 .card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(4,4,8,.6)0%,transparent 50%);opacity:0;transition:.3s;pointer-events:none}
 .card:hover .card-img::after{opacity:1}
 .price{position:absolute;top:8px;right:8px;z-index:2;padding:4px 11px;border-radius:100px;font-size:12px;font-weight:800;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.06);transition:.3s}
@@ -298,9 +293,19 @@ function renderFilters() {
   }).join('');
 }
 
+function getEmoji(category) {
+  const emojis = {
+    'Tops': '👕',
+    'Bottoms': '👖',
+    'Shoes': '👟',
+    'Accessories': '✨',
+    'Fragrances': '🌸',
+    'Tech': '🎧'
+  };
+  return emojis[category] || '📦';
+}
+
 function card(p, j) {
-  const proxyUrl = 'https://images.weserv.nl/?url=';
-  const imgs = p.images.map(u => `<img src="${proxyUrl}${encodeURIComponent(u)}" alt="${p.name}" loading="lazy">`).join('');
   const tag = p.tag ? `<div class="tag">${p.tag}</div>` : '';
   const oosClass = !p.inStock ? ' oos' : '';
   const soldBadge = !p.inStock ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
@@ -312,8 +317,10 @@ function card(p, j) {
     stockLabel = '✗ Out of Stock';
   }
   
+  const emoji = getEmoji(p.category);
+  
   return `<div class="card rv${oosClass}" style="transition-delay:${Math.min(j*30,350)}ms">
-    <div class="card-img">${tag}${soldBadge}${imgs}<div class="price">$${p.price}</div></div>
+    <div class="card-img">${tag}${soldBadge}${emoji}<div class="price">$${p.price}</div></div>
     <div class="card-body">
       <div class="card-name">${p.name}</div>
       ${p.colors ? `<div class="card-colors">Available: ${p.colors}</div>` : ''}
