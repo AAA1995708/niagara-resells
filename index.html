@@ -108,11 +108,6 @@ nav.scrolled{background:rgba(4,4,8,.92);border-bottom-color:rgba(255,255,255,.06
 .step h3{font-size:15px;font-weight:700;margin-bottom:6px}
 .step p{font-size:12.5px;color:rgba(255,255,255,.25);line-height:1.7}
 
-.cta-grid{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:32px}
-.cta-btn{display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:12px;font-weight:700;font-size:12.5px;transition:.3s}
-.cta-btn:hover{transform:translateY(-2px)}
-.cta-email{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;box-shadow:0 6px 20px rgba(59,130,246,.15)}
-
 footer{border-top:1px solid rgba(255,255,255,.03)}
 .foot{max-width:1400px;margin:auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .foot-logo{display:flex;align-items:center;gap:7px}
@@ -128,7 +123,6 @@ footer{border-top:1px solid rgba(255,255,255,.03)}
 .spinner{display:inline-block;width:24px;height:24px;border:2px solid rgba(59,130,246,.2);border-top-color:#3b82f6;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ORDER MODAL */
 .modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:#0c0c12;border:1px solid rgba(59,130,246,.2);border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -214,7 +208,6 @@ footer{border-top:1px solid rgba(255,255,255,.03)}
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-<!-- ORDER MODAL -->
 <div id="orderModal" class="modal-overlay">
   <div class="modal">
     <h2>Order <span id="productNameModal"></span></h2>
@@ -252,6 +245,7 @@ footer{border-top:1px solid rgba(255,255,255,.03)}
 <script>
 const SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1hyKxnPr2irBYcg0dFmJeUdIX3eOn9_Mf55nlTDyin5Q/export?format=csv';
 const STORE_EMAIL = 'liamwattps@gmail.com';
+const IMAGE_PROXY = 'https://niagara-image-proxy.onrender.com';
 
 let allProducts = [];
 let activeCategory = 'All';
@@ -299,8 +293,7 @@ function renderFilters() {
 }
 
 function card(p, j) {
-  const corsProxy = url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  const imgs = p.images.map(u => `<img src="${corsProxy(u)}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';">`).join('');
+  const imgs = p.images.map(u => `<img src="${IMAGE_PROXY}/image?url=${encodeURIComponent(u)}" alt="${p.name}" loading="lazy">`).join('');
   const tag = p.tag ? `<div class="tag">${p.tag}</div>` : '';
   const oosClass = !p.inStock ? ' oos' : '';
   const soldBadge = !p.inStock ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
