@@ -299,7 +299,8 @@ function renderFilters() {
 }
 
 function card(p, j) {
-  const imgs = p.images.map(u => `<img src="${u}" alt="${p.name}" loading="lazy">`).join('');
+  const proxyUrl = 'https://images.weserv.nl/?url=';
+  const imgs = p.images.map(u => `<img src="${proxyUrl}${encodeURIComponent(u)}" alt="${p.name}" loading="lazy">`).join('');
   const tag = p.tag ? `<div class="tag">${p.tag}</div>` : '';
   const oosClass = !p.inStock ? ' oos' : '';
   const soldBadge = !p.inStock ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
