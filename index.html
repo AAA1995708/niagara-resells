@@ -299,8 +299,8 @@ function renderFilters() {
 }
 
 function card(p, j) {
-  const cfProxy = url => `https://cdn.jsdelivr.net/gh/camo/placeholder@master/?${encodeURIComponent(url)}`;
-  const imgs = p.images.map(u => `<img src="${u}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=${encodeURIComponent(p.name)}';">`).join('');
+  const corsProxy = url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+  const imgs = p.images.map(u => `<img src="${corsProxy(u)}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';">`).join('');
   const tag = p.tag ? `<div class="tag">${p.tag}</div>` : '';
   const oosClass = !p.inStock ? ' oos' : '';
   const soldBadge = !p.inStock ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
@@ -369,7 +369,6 @@ window.addEventListener('scroll', () => {
   document.getElementById('gt').classList.toggle('show', window.scrollY > 500);
 }, { passive: true });
 
-// ORDER MODAL FUNCTIONS
 function openOrderModal(productName, price) {
   selectedProduct = { name: productName, price: price };
   document.getElementById('productNameModal').textContent = productName;
@@ -395,22 +394,7 @@ function submitOrder(e) {
   const notes = document.getElementById('notes').value;
   
   const subject = `Order Request: ${selectedProduct.name}`;
-  const message = `
-New Order Request:
 
-Product: ${selectedProduct.name}
-Price: $${selectedProduct.price}
-Color/Size: ${colorSize}
-Quantity: ${quantity}
-Customer Name: ${name}
-Customer Email: ${email}
-Notes: ${notes || 'None'}
-
----
-This is an automated message from Niagara Resells
-  `.trim();
-
-  // Using FormSubmit.co for email
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = `https://formsubmit.co/${STORE_EMAIL}`;
@@ -439,7 +423,6 @@ This is an automated message from Niagara Resells
   form.submit();
   document.body.removeChild(form);
   
-  // Show success message
   const msgEl = document.getElementById('formMessage');
   msgEl.className = 'form-message success';
   msgEl.textContent = 'Order sent! We\'ll contact you within 24 hours.';
@@ -449,7 +432,6 @@ This is an automated message from Niagara Resells
   }, 2000);
 }
 
-// Close modal on outside click
 document.getElementById('orderModal').addEventListener('click', (e) => {
   if (e.target.id === 'orderModal') closeOrderModal();
 });
