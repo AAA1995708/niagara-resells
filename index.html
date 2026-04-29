@@ -68,20 +68,22 @@ nav.scrolled{background:rgba(4,4,8,.92);border-bottom-color:rgba(255,255,255,.06
 
 .card{position:relative;border-radius:12px;overflow:hidden;background:#0c0c12;border:1px solid rgba(255,255,255,.04);transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s,border-color .3s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-6px);box-shadow:0 24px 48px -8px rgba(0,0,0,.5),0 0 0 1px rgba(59,130,246,.08);border-color:rgba(59,130,246,.12)}
-.card-img{position:relative;aspect-ratio:1;overflow:hidden;background:#08080c}
-.card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s ease,transform .6s cubic-bezier(.22,1,.36,1)}
+.card-img{position:relative;aspect-ratio:1;overflow:hidden;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:20px}
+.card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s ease,transform .6s cubic-bezier(.22,1,.36,1);display:none}
 .card-img img:first-child{position:relative;opacity:1}
 .card-img img:nth-child(n+2){opacity:0}
 .card:hover .card-img img:first-child{opacity:0;transform:scale(1.06)}
 .card:hover .card-img img:nth-child(2){opacity:1}
 .card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(4,4,8,.6)0%,transparent 50%);opacity:0;transition:.3s;pointer-events:none}
 .card:hover .card-img::after{opacity:1}
-.price{position:absolute;top:8px;right:8px;z-index:2;padding:4px 11px;border-radius:100px;font-size:12px;font-weight:800;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.06);transition:.3s}
-.card:hover .price{background:rgba(59,130,246,.85);color:#fff;border-color:rgba(59,130,246,.9);box-shadow:0 2px 12px rgba(59,130,246,.3)}
+.price{display:none}
 .tag{position:absolute;top:8px;left:8px;z-index:2;padding:3px 9px;border-radius:100px;font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.92);color:#000}
 .card-body{padding:12px 14px;flex:1;display:flex;flex-direction:column}
-.card-name{font-size:12.5px;font-weight:700;line-height:1.35;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-name{font-size:12.5px;font-weight:700;line-height:1.35;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#e0e0ff}
+.color-swatches{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}
 .card:hover .card-name{color:#60a5fa}
+.color-swatch{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.3);transition:.2s;cursor:pointer}
+.color-swatch:hover{border-color:#3b82f6;transform:scale(1.1)}
 .card-colors{font-size:9.5px;color:rgba(255,255,255,.25);margin-top:5px}
 .card-stock{font-size:10px;color:#22c55e;margin-top:6px;padding:6px;background:rgba(34,197,94,.08);border-radius:6px;font-weight:600}
 .card-stock.oos{color:#ef4444;background:rgba(239,68,68,.08)}
@@ -293,7 +295,17 @@ function renderFilters() {
 }
 
 function card(p, j) {
-  const imgs = p.images.map(u => `<img src="${IMAGE_PROXY}/image?url=${encodeURIComponent(u)}" alt="${p.name}" loading="lazy">`).join('');
+  const colorMap = {'Black':'#000','White':'#FFF','Red':'#EF4444','Blue':'#3B82F6','Grey':'#9CA3AF','Green':'#22C55E','Pink':'#EC4899','Gold':'#F59E0B','Silver':'#D1D5DB','Navy':'#001F3F','Beige':'#F5F5DC','Brown':'#8B4513','Purple':'#A855F7','Orange':'#F97316','Yellow':'#EAB308'};
+  const getColors = (colorStr) => {
+    if (!colorStr) return [];
+    return colorStr.split(',').slice(0, 5).map(c => {
+      const color = c.trim().split(':')[0].trim();
+      return {name: color, hex: colorMap[color] || '#666'};
+    });
+  };
+  const colors = getColors(p.colors);
+  const colorSwatches = colors.length > 0 ? `<div class="color-swatches">${colors.map(c => `<div class="color-swatch" style="background-color:${c.hex}" title="${c.name}"></div>`).join('')}</div>` : '';
+  const categoryIcon = {'Tops':'👕','Bottoms':'👖','Shoes':'👟','Accessories':'✨','Fragrances':'🌸','Tech':'🎧'}[p.category] || '📦';
   const tag = p.tag ? `<div class="tag">${p.tag}</div>` : '';
   const oosClass = !p.inStock ? ' oos' : '';
   const soldBadge = !p.inStock ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
@@ -306,15 +318,16 @@ function card(p, j) {
   }
   
   return `<div class="card rv${oosClass}" style="transition-delay:${Math.min(j*30,350)}ms">
-    <div class="card-img">${tag}${soldBadge}${imgs}<div class="price">$${p.price}</div></div>
+    <div class="card-img" style="font-size:48px;">${categoryIcon}<div style="font-size:13px;color:rgba(255,255,255,.4);text-align:center;">${p.category}</div>${colorSwatches}</div>
     <div class="card-body">
-      <div class="card-name">${p.name}</div>
-      ${p.colors ? `<div class="card-colors">Available: ${p.colors}</div>` : ''}
-      <div class="${stockClass}">${stockLabel}</div>
-      ${p.inventory ? `<div class="card-inventory">📦 ${p.inventory}</div>` : ''}
+      <div class="card-name">$${p.price}</div>
+      <div class="card-name" style="font-size:14px;font-weight:800;margin-top:8px;">${p.name}</div>
+      ${p.colors ? `<div class="card-colors" style="font-size:9px;margin-top:8px;">Colors: ${p.colors.split('|')[0]}</div>` : ''}
+      <div class="${stockClass}" style="margin-top:10px;">${stockLabel}</div>
+      ${p.inventory ? `<div class="card-inventory" style="margin-top:8px;font-weight:600;">📦 ${p.inventory}</div>` : ''}
       ${p.note ? `<div class="card-note">💬 ${p.note}</div>` : ''}
       <div class="card-action">
-        <button class="order-btn" onclick="openOrderModal('${p.name}', ${p.price})${!p.inStock ? ' disabled' : ''}">${!p.inStock ? 'OUT OF STOCK' : 'Order This'}</button>
+        <button class="order-btn" onclick="openOrderModal('${p.name}', ${p.price})${!p.inStock ? ' disabled' : ''}" style="margin-top:12px;">${!p.inStock ? 'OUT OF STOCK' : 'Order This'}</button>
       </div>
     </div>
   </div>`;
