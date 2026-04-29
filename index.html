@@ -262,7 +262,7 @@ footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 40px 24px; text-
 </div>
 
 <script>
-const SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1hyKxnPr2irBYcg0dFmJeUdIX3eOn9_Mf55nlTDyin5Q/export?format=csv';
+const SHEETS_EXPORT = 'https://docs.google.com/spreadsheets/d/1hyKxnPr2irBYcg0dFmJeUdIX3eOn9_Mf55nlTDyin5Q/export?format=csv&gid=0';
 const EMAIL = 'liamwattps@gmail.com';
 
 let allProducts = [];
@@ -273,32 +273,40 @@ let currentImages = [];
 
 async function loadProducts() {
   try {
-    const res = await fetch(SHEETS_URL);
+    const res = await fetch(SHEETS_EXPORT);
+    if (!res.ok) throw new Error('Failed to fetch');
     const csv = await res.text();
-    const lines = csv.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
+    parseCSV(csv);
+  } catch(e) {
+    console.error('Failed to load products:', e);
+    document.getElementById('grid').innerHTML = '<div class="empty">Unable to load products. Please refresh the page.</div>';
+  }
+}
+
+function parseCSV(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim());
+  
+  allProducts = lines.slice(1).map(line => {
+    const vals = line.split(',').map(v => v.trim());
+    const imagesStr = vals[headers.indexOf('images')] || '';
+    const images = imagesStr ? imagesStr.split('|').map(u => u.trim()).filter(u => u) : [];
     
-    allProducts = lines.slice(1).map(line => {
-      const vals = line.split(',').map(v => v.trim());
-      const imagesStr = vals[headers.indexOf('images')] || '';
-      const images = imagesStr ? imagesStr.split('|').map(u => u.trim()).filter(u => u) : [];
-      
-      return {
-        name: vals[headers.indexOf('name')] || '',
-        price: parseInt(vals[headers.indexOf('price')]) || 0,
-        category: vals[headers.indexOf('category')] || 'Other',
-        colors: vals[headers.indexOf('colors')] || '',
-        inventory: vals[headers.indexOf('inventory')] || '',
-        note: vals[headers.indexOf('note')] || '',
-        tag: vals[headers.indexOf('tag')] || '',
-        inStock: vals[headers.indexOf('inStock')]?.toLowerCase() !== 'false',
-        images: images
-      };
-    }).filter(p => p.name);
-    
-    renderFilters();
-    render();
-  } catch(e) { console.error(e); }
+    return {
+      name: vals[headers.indexOf('name')] || '',
+      price: parseInt(vals[headers.indexOf('price')]) || 0,
+      category: vals[headers.indexOf('category')] || 'Other',
+      colors: vals[headers.indexOf('colors')] || '',
+      inventory: vals[headers.indexOf('inventory')] || '',
+      note: vals[headers.indexOf('note')] || '',
+      tag: vals[headers.indexOf('tag')] || '',
+      inStock: vals[headers.indexOf('inStock')]?.toLowerCase() !== 'false',
+      images: images
+    };
+  }).filter(p => p.name);
+  
+  renderFilters();
+  render();
 }
 
 function renderFilters() {
@@ -456,3 +464,6 @@ document.getElementById('orderModal').addEventListener('click', (e) => {
 });
 
 loadProducts();
+</script>
+</body>
+</html>
