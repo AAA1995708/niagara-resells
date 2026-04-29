@@ -285,26 +285,41 @@ async function loadProducts() {
 
 function parseCSV(csv) {
   const lines = csv.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
+  const headerLine = lines[0].split(',').map(h => h.trim());
+  
+  const nameIdx = headerLine.indexOf('name');
+  const priceIdx = headerLine.indexOf('price');
+  const categoryIdx = headerLine.indexOf('category');
+  const colorsIdx = headerLine.indexOf('colors');
+  const inventoryIdx = headerLine.indexOf('inventory');
+  const noteIdx = headerLine.indexOf('note');
+  const tagIdx = headerLine.indexOf('tag');
+  const inStockIdx = headerLine.indexOf('inStock');
+  const imagesIdx = headerLine.indexOf('images');
   
   allProducts = lines.slice(1).map(line => {
     const vals = line.split(',').map(v => v.trim());
-    const imagesStr = vals[headers.indexOf('images')] || '';
-    const images = imagesStr ? imagesStr.split('|').map(u => u.trim()).filter(u => u) : [];
+    
+    const name = vals[nameIdx] || '';
+    if (!name) return null;
+    
+    const imagesStr = vals[imagesIdx] || '';
+    const images = imagesStr ? imagesStr.split('|').map(u => u.trim()).filter(u => u && (u.startsWith('http') || u.startsWith('data'))) : [];
     
     return {
-      name: vals[headers.indexOf('name')] || '',
-      price: parseInt(vals[headers.indexOf('price')]) || 0,
-      category: vals[headers.indexOf('category')] || 'Other',
-      colors: vals[headers.indexOf('colors')] || '',
-      inventory: vals[headers.indexOf('inventory')] || '',
-      note: vals[headers.indexOf('note')] || '',
-      tag: vals[headers.indexOf('tag')] || '',
-      inStock: vals[headers.indexOf('inStock')]?.toLowerCase() !== 'false',
+      name: name,
+      price: parseInt(vals[priceIdx]) || 0,
+      category: vals[categoryIdx] || 'Other',
+      colors: vals[colorsIdx] || '',
+      inventory: vals[inventoryIdx] || '',
+      note: vals[noteIdx] || '',
+      tag: vals[tagIdx] || '',
+      inStock: vals[inStockIdx]?.toLowerCase() !== 'false',
       images: images
     };
-  }).filter(p => p.name);
+  }).filter(p => p);
   
+  console.log('Loaded products:', allProducts.length);
   renderFilters();
   render();
 }
