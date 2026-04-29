@@ -52,20 +52,20 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 999; background: rgba
 
 .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; transition: .3s; cursor: pointer; }
 .card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); transform: translateY(-4px); }
-.card-img { aspect-ratio: 1; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); display: flex; align-items: center; justify-content: center; font-size: 64px; color: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
-.card-img img { width: 100%; height: 100%; object-fit: cover; }
+.card-img-container { aspect-ratio: 1; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.card-img { width: 100%; height: 100%; object-fit: cover; }
 .card-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 3px; }
+.image-count { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; padding: 4px 8px; font-size: 10px; font-weight: 600; border-radius: 3px; }
 .card-content { padding: 16px; }
 .card-price { font-size: 20px; font-weight: 900; margin-bottom: 8px; color: #fff; }
 .card-name { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
 .card-colors { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px; line-height: 1.5; }
 .card-stock { font-size: 11px; font-weight: 600; color: #22c55e; margin-bottom: 12px; }
 .card-stock.oos { color: #ef4444; }
-.card-note { font-size: 10px; color: rgba(255,255,255,0.3); margin-bottom: 12px; font-style: italic; }
 .card-action { margin-top: 16px; }
-.btn-order { width: 100%; padding: 10px; background: #fff; color: #000; font-weight: 700; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; transition: .2s; }
-.btn-order:hover:not(:disabled) { transform: translateY(-2px); }
-.btn-order:disabled { opacity: 0.5; cursor: not-allowed; background: #666; }
+.btn-view { width: 100%; padding: 10px; background: #fff; color: #000; font-weight: 700; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; transition: .2s; }
+.btn-view:hover { transform: translateY(-2px); }
+.btn-view:disabled { opacity: 0.5; cursor: not-allowed; background: #666; }
 
 .empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4); grid-column: 1/-1; }
 
@@ -76,10 +76,38 @@ footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 40px 24px; text-
 .footer-contact a:hover { color: #fff; }
 .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
 
-/* MODAL */
+/* MODALS */
 .modal { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px; }
 .modal.open { display: flex; }
-.modal-content { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; max-width: 480px; width: 100%; padding: 32px; max-height: 90vh; overflow-y: auto; }
+.modal-content { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; max-width: 600px; width: 100%; padding: 32px; max-height: 90vh; overflow-y: auto; }
+.close-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 28px; cursor: pointer; }
+.close-btn:hover { color: #fff; }
+
+/* PRODUCT DETAIL MODAL */
+.detail-modal { position: relative; }
+.detail-images { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.detail-img-container { width: 100%; max-width: 400px; aspect-ratio: 1; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.detail-img { width: 100%; height: 100%; object-fit: cover; }
+.img-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: #fff; border: none; width: 40px; height: 40px; cursor: pointer; font-size: 20px; border-radius: 4px; }
+.img-prev { left: 8px; }
+.img-next { right: 8px; }
+.img-counter { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 4px 12px; font-size: 12px; border-radius: 3px; }
+.detail-info h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+.detail-price { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 16px; }
+.detail-section { margin-bottom: 20px; }
+.detail-section h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+.detail-section p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+.detail-stock { font-size: 14px; font-weight: 600; color: #22c55e; margin-bottom: 20px; }
+.detail-stock.oos { color: #ef4444; }
+.detail-actions { display: flex; gap: 12px; margin-top: 24px; }
+.detail-actions button { flex: 1; padding: 12px; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer; transition: .2s; }
+.btn-order { background: #fff; color: #000; }
+.btn-order:hover { transform: translateY(-2px); }
+.btn-close { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-close:hover { background: rgba(255,255,255,0.15); }
+
+/* ORDER MODAL */
+.order-modal { }
 .modal-head { margin-bottom: 24px; }
 .modal-head h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 .modal-head p { font-size: 13px; color: rgba(255,255,255,0.4); }
@@ -155,8 +183,50 @@ footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 40px 24px; text-
   <p class="footer-copy">&copy; 2025 Niagara Resells. All rights reserved.</p>
 </footer>
 
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal" id="detailModal">
+  <div class="modal-content detail-modal">
+    <button class="close-btn" onclick="closeDetail()">&times;</button>
+    <div class="detail-images">
+      <div class="detail-img-container">
+        <img id="detailImg" class="detail-img" src="" alt="">
+        <button class="img-nav img-prev" onclick="prevImage()">‹</button>
+        <button class="img-nav img-next" onclick="nextImage()">›</button>
+        <div class="img-counter"><span id="imgCounter">1</span> / <span id="imgTotal">1</span></div>
+      </div>
+    </div>
+    <div class="detail-info">
+      <h2 id="detailName"></h2>
+      <div class="detail-price" id="detailPrice"></div>
+      <div class="detail-stock" id="detailStock"></div>
+      
+      <div class="detail-section" id="colorsSection" style="display:none;">
+        <h3>Available Colors</h3>
+        <p id="detailColors"></p>
+      </div>
+      
+      <div class="detail-section" id="inventorySection" style="display:none;">
+        <h3>Inventory</h3>
+        <p id="detailInventory"></p>
+      </div>
+      
+      <div class="detail-section" id="noteSection" style="display:none;">
+        <h3>Details</h3>
+        <p id="detailNote"></p>
+      </div>
+      
+      <div class="detail-actions">
+        <button class="btn-order" onclick="openOrder()" id="orderBtnDetail">Order Now</button>
+        <button class="btn-close" onclick="closeDetail()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
 <div class="modal" id="orderModal">
-  <div class="modal-content">
+  <div class="modal-content order-modal">
+    <button class="close-btn" onclick="closeOrder()">&times;</button>
     <div class="modal-head">
       <h2>Order <span id="productName"></span></h2>
       <p>Fill out your details below</p>
@@ -184,7 +254,7 @@ footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 40px 24px; text-
       </div>
       <div id="msg" class="msg"></div>
       <div class="form-actions">
-        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn-cancel" onclick="closeOrder()">Cancel</button>
         <button type="submit" class="btn-submit">Send Order</button>
       </div>
     </form>
@@ -198,6 +268,8 @@ const EMAIL = 'liamwattps@gmail.com';
 let allProducts = [];
 let activeFilter = 'All';
 let selected = null;
+let currentImageIndex = 0;
+let currentImages = [];
 
 async function loadProducts() {
   try {
@@ -208,6 +280,9 @@ async function loadProducts() {
     
     allProducts = lines.slice(1).map(line => {
       const vals = line.split(',').map(v => v.trim());
+      const imagesStr = vals[headers.indexOf('images')] || '';
+      const images = imagesStr ? imagesStr.split('|').map(u => u.trim()).filter(u => u) : [];
+      
       return {
         name: vals[headers.indexOf('name')] || '',
         price: parseInt(vals[headers.indexOf('price')]) || 0,
@@ -217,7 +292,7 @@ async function loadProducts() {
         note: vals[headers.indexOf('note')] || '',
         tag: vals[headers.indexOf('tag')] || '',
         inStock: vals[headers.indexOf('inStock')]?.toLowerCase() !== 'false',
-        images: vals[headers.indexOf('images')] || ''
+        images: images
       };
     }).filter(p => p.name);
     
@@ -251,33 +326,84 @@ function render() {
   }
   
   document.getElementById('grid').innerHTML = list.map(p => {
-    const imgTag = p.images ? `<img src="${p.images}" alt="${p.name}">` : '';
+    const firstImg = p.images.length > 0 ? p.images[0] : '';
+    const imgCount = p.images.length > 1 ? `<div class="image-count">${p.images.length}</div>` : '';
     return `
-    <div class="card" onclick="openModal('${p.name}', ${p.price})">
-      <div class="card-img">
-        ${imgTag}
+    <div class="card" onclick="openDetail(${allProducts.indexOf(p)})">
+      <div class="card-img-container">
+        ${firstImg ? `<img class="card-img" src="${firstImg}" alt="${p.name}">` : ''}
+        ${imgCount}
         ${p.tag ? `<div class="card-badge">${p.tag}</div>` : ''}
       </div>
       <div class="card-content">
         <div class="card-price">$${p.price}</div>
         <div class="card-name">${p.name}</div>
         ${p.colors ? `<div class="card-colors">${p.colors}</div>` : ''}
-        ${p.note ? `<div class="card-note">${p.note}</div>` : ''}
         <div class="card-stock ${!p.inStock ? 'oos' : ''}">${!p.inStock ? 'Out of Stock' : 'In Stock'}</div>
-        <button class="btn-order" ${!p.inStock ? 'disabled' : ''}>${!p.inStock ? 'Unavailable' : 'Order'}</button>
+        <button class="btn-view" ${!p.inStock ? 'disabled' : ''}>View Details</button>
       </div>
     </div>
   `}).join('');
 }
 
-function openModal(name, price) {
-  selected = {name, price};
-  document.getElementById('productName').textContent = name;
-  document.getElementById('orderModal').classList.add('open');
+function openDetail(idx) {
+  selected = allProducts[idx];
+  currentImages = selected.images;
+  currentImageIndex = 0;
+  
+  document.getElementById('detailName').textContent = selected.name;
+  document.getElementById('detailPrice').textContent = `$${selected.price}`;
+  document.getElementById('detailStock').textContent = selected.inStock ? 'In Stock' : 'Out of Stock';
+  document.getElementById('detailStock').className = `detail-stock ${!selected.inStock ? 'oos' : ''}`;
+  
+  document.getElementById('colorsSection').style.display = selected.colors ? 'block' : 'none';
+  document.getElementById('detailColors').textContent = selected.colors;
+  
+  document.getElementById('inventorySection').style.display = selected.inventory ? 'block' : 'none';
+  document.getElementById('detailInventory').textContent = selected.inventory;
+  
+  document.getElementById('noteSection').style.display = selected.note ? 'block' : 'none';
+  document.getElementById('detailNote').textContent = selected.note;
+  
+  document.getElementById('orderBtnDetail').disabled = !selected.inStock;
+  
+  updateDetailImage();
+  document.getElementById('detailModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function nextImage() {
+  if (currentImages.length > 1) {
+    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+    updateDetailImage();
+  }
+}
+
+function prevImage() {
+  if (currentImages.length > 1) {
+    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+    updateDetailImage();
+  }
+}
+
+function updateDetailImage() {
+  document.getElementById('detailImg').src = currentImages[currentImageIndex] || '';
+  document.getElementById('imgCounter').textContent = currentImageIndex + 1;
+  document.getElementById('imgTotal').textContent = currentImages.length;
+}
+
+function openOrder() {
+  document.getElementById('productName').textContent = selected.name;
+  document.getElementById('detailModal').classList.remove('open');
+  document.getElementById('orderModal').classList.add('open');
+}
+
+function closeOrder() {
   document.getElementById('orderModal').classList.remove('open');
   document.getElementById('orderForm').reset();
   document.getElementById('msg').className = 'msg';
@@ -318,16 +444,15 @@ function submitOrder(e) {
   document.getElementById('msg').className = 'msg success';
   document.getElementById('msg').textContent = 'Order sent! Check your email or Snap for next steps.';
   
-  setTimeout(closeModal, 2000);
+  setTimeout(closeOrder, 2000);
 }
 
 document.getElementById('search').addEventListener('input', render);
+document.getElementById('detailModal').addEventListener('click', (e) => {
+  if (e.target.id === 'detailModal') closeDetail();
+});
 document.getElementById('orderModal').addEventListener('click', (e) => {
-  if (e.target.id === 'orderModal') closeModal();
+  if (e.target.id === 'orderModal') closeOrder();
 });
 
 loadProducts();
-</script>
-
-</body>
-</html>
