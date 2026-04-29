@@ -264,6 +264,12 @@ footer { border-top: 1px solid var(--border); padding: 80px 32px 40px; text-alig
 .order-summary-item:last-child { margin-bottom: 0; font-weight: 700; color: var(--text); }
 .order-total { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px; color: var(--niagara-light); }
 
+/* CART WIDGET */
+.cart-widget { position: fixed; bottom: 24px; left: 24px; z-index: 99; cursor: pointer; display: none; animation: float-up 0.5s ease; }
+.cart-btn { background: var(--surface); color: #fff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid var(--border); transition: 0.3s; position: relative; }
+.cart-btn:hover { border-color: var(--niagara-blue); transform: translateY(-5px); }
+.cart-count { position: absolute; top: -5px; right: -5px; background: var(--niagara-blue); color: #fff; font-size: 13px; font-weight: 800; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #050505; }
+
 /* 3D LOADER ANIMATION */
 .loader-overlay { position: fixed; inset: 0; background: #050505; z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease, visibility 0.5s ease; perspective: 1000px; overflow: hidden; }
 .loader-overlay.hidden { opacity: 0; visibility: hidden; }
@@ -375,6 +381,11 @@ footer { border-top: 1px solid var(--border); padding: 80px 32px 40px; text-alig
   <div class="snap-tooltip">Contact me on Snap - Fastest way!</div>
 </div>
 
+<!-- CART WIDGET (FLOATING) -->
+<div class="cart-widget" id="cartWidget" onclick="openOrder()">
+  <div class="cart-btn">🛍️ <span class="cart-count" id="cartCount">0</span></div>
+</div>
+
 <footer>
   <div class="footer-contact">
     <p><a href="javascript:snapContact()">📸 Contact on Snapchat</a> — <a href="mailto:liamwattps@gmail.com">Email Support</a></p>
@@ -418,7 +429,7 @@ footer { border-top: 1px solid var(--border); padding: 80px 32px 40px; text-alig
       </div>
       
       <div class="detail-actions">
-        <button class="btn-order" onclick="openOrder()" id="orderBtnDetail">Add to Bundle</button>
+        <button class="btn-order" onclick="addToBundle()" id="orderBtnDetail">Add to Bundle</button>
         <button class="btn-close-detail" onclick="closeDetail()">Close</button>
       </div>
     </div>
@@ -460,6 +471,11 @@ footer { border-top: 1px solid var(--border); padding: 80px 32px 40px; text-alig
         <label class="form-label" id="contactLabel">Snapchat Username *</label>
         <input type="text" class="form-input" id="contact" placeholder="@yourname" required>
         <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px;">We'll reach out ASAP with details</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Special Instructions / Custom Requests</label>
+        <textarea class="form-input" id="specialInstructions" placeholder="e.g. Size 10, meet at Eaton Centre, etc." rows="2" style="resize: vertical;"></textarea>
       </div>
 
       <div class="order-summary" id="orderSummary" style="display:none;">
@@ -684,6 +700,12 @@ function handleKeyboard(e) {
 }
 
 function openOrder() {
+  document.getElementById('detailModal').classList.remove('open');
+  document.getElementById('orderModal').classList.add('open');
+  updatePackageList();
+}
+
+function addToBundle() {
   if (!selected) return;
   
   const existing = selectedProducts.findIndex(p => p.name === selected.name);
@@ -691,9 +713,23 @@ function openOrder() {
     selectedProducts.push({...selected, quantity: 1});
   }
   
-  document.getElementById('detailModal').classList.remove('open');
-  document.getElementById('orderModal').classList.add('open');
-  updatePackageList();
+  updateCartBadge();
+  
+  const btn = document.getElementById('orderBtnDetail');
+  const origText = btn.textContent;
+  btn.textContent = 'Added! ✓';
+  btn.style.background = '#22c55e';
+  setTimeout(() => {
+    btn.textContent = origText;
+    btn.style.background = '';
+  }, 1500);
+}
+
+function updateCartBadge() {
+  const count = selectedProducts.filter(p => p.selected !== false).length;
+  document.getElementById('cartCount').textContent = count;
+  if (count === 0) document.getElementById('cartWidget').style.display = 'none';
+  else document.getElementById('cartWidget').style.display = 'block';
 }
 
 function closeOrder() {
@@ -728,11 +764,13 @@ function toggleProduct(i) {
   const checked = document.getElementById(`prod-${i}`).checked;
   selectedProducts[i].selected = checked;
   updateOrderSummary();
+  updateCartBadge();
 }
 
 function removeProduct(i) {
   selectedProducts.splice(i, 1);
   updatePackageList();
+  updateCartBadge();
 }
 
 function updateOrderSummary() {
@@ -783,14 +821,17 @@ contactMethodRadios.forEach(radio => {
 async function submitOrder(e) {
   e.preventDefault();
   
-  if (selectedProducts.length === 0) {
+  const finalItems = selectedProducts.filter(p => p.selected !== false);
+  
+  if (finalItems.length === 0) {
     document.getElementById('msg').className = 'msg error';
-    document.getElementById('msg').textContent = 'Please add at least one item';
+    document.getElementById('msg').textContent = 'Your bundle is empty';
     return;
   }
   
   const contactMethod = document.querySelector('input[name="contactMethod"]:checked').value;
   const contact = document.getElementById('contact').value.trim();
+  const notes = document.getElementById('specialInstructions').value.trim();
   
   if (!contact) {
     document.getElementById('msg').className = 'msg error';
@@ -802,8 +843,8 @@ async function submitOrder(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
   
-  const items = selectedProducts.map(p => `${p.name} - $${p.price}`).join('\n');
-  const total = selectedProducts.reduce((sum, p) => sum + p.price, 0);
+  const itemsStr = finalItems.map(p => `• ${p.name} - $${p.price}`).join('\n');
+  const total = finalItems.reduce((sum, p) => sum + p.price, 0);
   
   const discordMessage = {
     content: `🛍️ **New Bundle Request**`,
@@ -812,9 +853,9 @@ async function submitOrder(e) {
       fields: [
         { name: 'Contact Method', value: contactMethod === 'snapchat' ? '📸 Snapchat' : '💌 Email', inline: true },
         { name: 'Contact Info', value: contact, inline: true },
-        { name: 'Items', value: items, inline: false },
-        { name: 'Total Value', value: `$${total}`, inline: true },
-        { name: 'Time', value: new Date().toLocaleString(), inline: true }
+        { name: 'Special Instructions', value: notes || 'None', inline: false },
+        { name: 'Items', value: itemsStr, inline: false },
+        { name: 'Total Value', value: `$${total}`, inline: true }
       ],
       color: 16776960
     }]
@@ -832,6 +873,7 @@ async function submitOrder(e) {
     
     setTimeout(() => {
       selectedProducts = [];
+      updateCartBadge();
       closeOrder();
     }, 2000);
   } catch(err) {
